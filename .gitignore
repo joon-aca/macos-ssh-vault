@@ -1,0 +1,14 @@
+.DS_Store
+*.tar.gz
+*.zip
+*.dmg
+*.sparsebundle
+*.sparseimage
+*.pem
+*.key
+*.p12
+*.pfx
+*.age
+*.gpg
+id_*
+dist/

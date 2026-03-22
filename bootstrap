@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+# shellcheck source=libexec/ssh-vault/common.sh
+source "${SCRIPT_DIR}/libexec/ssh-vault/common.sh"
+
+usage() {
+  cat <<'EOF'
+Usage: ./bootstrap <profile> [options]
+
+Provisions ~/.ssh from an encrypted vault profile.
+
+Options:
+  --keep-mounted    Don't unmount vault after deploy
+  --force           Override safety checks on existing ~/.ssh
+  --help            Show this help
+EOF
+}
+
+profile=""
+keep_mounted=0
+force=0
+
+for arg in "$@"; do
+  case "$arg" in
+    --keep-mounted) keep_mounted=1 ;;
+    --force)        force=1 ;;
+    --help|-h)      usage; exit 0 ;;
+    -*)             die "unknown option: $arg" ;;
+    *)
+      [ -z "$profile" ] || die "unexpected argument: $arg"
+      profile="$arg"
+      ;;
+  esac
+done
+
+[ -n "$profile" ] || { usage; exit 1; }
+
+bootstrap_profile "$profile" "$keep_mounted" "$force"
+log "bootstrapped profile: ${profile}"

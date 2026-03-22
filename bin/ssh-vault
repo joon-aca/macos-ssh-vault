@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+# shellcheck source=../libexec/ssh-vault/common.sh
+source "${SCRIPT_DIR}/../libexec/ssh-vault/common.sh"
+
+usage() {
+  cat <<'EOF'
+Usage: ssh-vault <command> [options]
+
+Commands:
+  init [size]          Create encrypted sparsebundle (default 250m)
+  mount                Mount the vault
+  unmount              Unmount the vault
+  list                 List available profiles
+  status               Show vault status
+  sync <profile>       Sync local ~/.ssh into a vault profile
+  backup <target>      Back up the sparsebundle to target path
+  restore <source>     Restore sparsebundle from backup
+
+Options:
+  --keep-mounted       Don't unmount after sync
+  --force              Override safety checks
+  --help               Show this help
+EOF
+}
+
+cmd="${1:-}"
+shift || true
+
+case "$cmd" in
+  init)
+    size="${1:-250m}"
+    ensure_macos
+    require_command hdiutil
+    ensure_bundle_exists "$size"
+    attach_bundle
+    log "vault initialized at $(bundle_path)"
+    detach_bundle
+    ;;
+
+  mount)
+    ensure_macos
+    require_command hdiutil
+    attach_bundle
+    log "vault mounted at $(mount_point)"
+    ;;
+
+  unmount)
+    detach_bundle
+    log "vault unmounted"
+    ;;
+
+  list)
+    ensure_macos
+    require_command hdiutil
+    attach_bundle
+    list_profiles
+    detach_bundle
+    ;;
+
+  status)
+    status_summary
+    ;;
+
+  sync)
+    profile="${1:-}"
+    [ -n "$profile" ] || die "usage: ssh-vault sync <profile>"
+    shift
+
+    keep_mounted=0
+    for arg in "$@"; do
+      case "$arg" in
+        --keep-mounted) keep_mounted=1 ;;
+        *) die "unknown option: $arg" ;;
+      esac
+    done
+
+    sync_profile "$profile" "$keep_mounted"
+    log "synced local ssh data into profile: ${profile}"
+    ;;
+
+  backup)
+    target="${1:-}"
+    [ -n "$target" ] || die "usage: ssh-vault backup <target-path>"
+    backup_vault "$target"
+    ;;
+
+  restore)
+    source_path="${1:-}"
+    [ -n "$source_path" ] || die "usage: ssh-vault restore <source-path>"
+    restore_vault "$source_path"
+    ;;
+
+  help|--help|-h)
+    usage
+    ;;
+
+  "")
+    usage
+    exit 1
+    ;;
+
+  *)
+    die "unknown command: $cmd"
+    ;;
+esac
