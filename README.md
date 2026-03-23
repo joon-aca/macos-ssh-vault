@@ -6,7 +6,7 @@ You have SSH keys on your Mac. Probably a dozen of them. They live in `~/.ssh` a
 
 Now picture setting up a new Mac, or recovering from a dead drive. Where are those keys? Scattered across old backups? In a password manager? On a USB stick in a drawer?
 
-**macos-ssh-vault** keeps everything in a single AES-256 encrypted sparsebundle in iCloud Drive — your config, your keys, your host definitions — and deploys it all to any of your Macs with one command:
+**macos-ssh-vault** keeps everything in a single AES-256 encrypted sparsebundle on your iCloud Drive — your config, your keys, your host definitions — and deploys it all to any of your Macs with one command:
 
 ```bash
 ./bootstrap ssh-canonical
@@ -24,7 +24,7 @@ Encrypted Vault (iCloud)          Local ~/.ssh
 │  profiles/           │  deploy  │  config              │
 │    ssh-canonical/    │ ──────>  │  conf.d/*.conf       │
 │      config          │          │  id_rsa, fio_key ... │
-│      conf.d/*.conf   │  sync   │  local.d/config      │
+│      conf.d/*.conf   │   sync   │  local.d/config      │
 │      id_rsa, ...     │ <──────  │  known_hosts (local) │
 │      local.d/        │          │                      │
 │      iterm-profiles  │          │                      │
