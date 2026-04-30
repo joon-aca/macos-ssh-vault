@@ -14,6 +14,25 @@ Now picture setting up a new Mac, or recovering from a dead drive. Where are tho
 
 That's it. Your config, your host definitions, your keys — all provisioned into `~/.ssh`, permissions fixed, sanity-checked. Same identity, any Mac, sixty seconds.
 
+## Pairs with [`mydotfiles`](https://github.com/joon-aca/mydotfiles)
+
+This is the SSH-identity half of a two-step Mac provisioning workflow:
+
+1. **[`mydotfiles`](https://github.com/joon-aca/mydotfiles)** — shell, git, tmux, editors, CLI tools
+2. **`macos-ssh-vault`** (this repo) — `~/.ssh` config and keys, from the encrypted iCloud vault
+
+`mydotfiles` intentionally does not touch `~/.ssh`. This repo owns it entirely.
+
+```bash
+# Step 1
+git clone git@github.com:joon-aca/mydotfiles.git ~/.mydotfiles
+~/.mydotfiles/bootstrap.sh
+
+# Step 2
+git clone git@github.com:joon-aca/macos-ssh-vault.git ~/.macos-ssh-vault
+~/.macos-ssh-vault/bootstrap ssh-canonical
+```
+
 ## How it works
 
 Your SSH data lives in an AES-256 encrypted sparsebundle in iCloud Drive. The vault holds everything portable about your SSH identity: config, host files, keys, even iTerm profiles. This repo holds only the tooling to manage it — no secrets ever touch git.
