@@ -63,6 +63,8 @@ macos-ssh-vault keeps it simple: one encrypted container, one sync target, one c
 
 ## Quick start
 
+> For day-to-day workflows (sync, add hosts/keys, backups, recovery), see [QUICKREF.md](QUICKREF.md).
+
 **First time — import your existing SSH setup:**
 
 ```bash
